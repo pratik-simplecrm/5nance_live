@@ -1,0 +1,1 @@
+SUGAR.language.setLanguage('Users', null);

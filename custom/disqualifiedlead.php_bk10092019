@@ -1,0 +1,388 @@
+<?php
+//~ echo "ok";exit;
+  session_start();
+  if(!defined('sugarEntry') || !sugarEntry) die('Not A Valid Entry Point');
+
+
+  global $db,$sugar_config,$current_user;
+  $url = $sugar_config['webservice_url'];
+  $username = $sugar_config['webservice_username'];
+  $password = $sugar_config['webservice_password'];
+
+  $fp      = fopen('php://input', 'r');
+  $rawData = json_decode(stream_get_contents($fp));
+
+  /*print_r($rawData); 
+  echo "<br>";
+  echo $rawData->userID;
+  echo "<br>";
+  echo $rawData->userStatus;
+  echo "<br>";
+  echo $rawData->dropStage;
+  echo "<br>";
+  echo $rawData->rejectionReason;*/
+  //exit;
+
+  /*$userID = $_REQUEST['userID'];
+  $userStatus = $_REQUEST['userStatus'];
+  $dropStage = $_REQUEST['dropStage'];
+  $rejectionReason = $_REQUEST['rejectionReason'];*/
+
+  $userID = $rawData->userID;
+  $userStatus = $rawData->userStatus;
+  $dropStage = $rawData->dropStage;
+  $rejectionReason = $rawData->rejectionReason;
+
+  //login to generate session ID -------------   
+    
+  $login_parameters = array(
+  	"user_auth" => array(
+    "user_name" => $username,
+    "password" => md5($password),
+    "version" => "1"
+  	),
+    "application_name" => "RestTest",
+    "name_value_list" => array(),
+  );
+
+  $login_result = call("login", $login_parameters, $url);
+  //get session id
+  $session_id = $login_result->id;
+
+  $contactId = '';
+
+  $sql = "select id_c from contacts_cstm where unique_customer_code_c = ".$userID;
+  $result = $db->query($sql);
+  while($row = $db->fetchByAssoc($result) )
+  {
+    $contactId = $row['id_c'];
+  }
+  
+  //select id_c from contacts_cstm where unique_customer_code_c = 61118
+
+  if($contactId!='' && $userID !='')
+  {
+    if($userStatus == 'Rejected')
+    {
+      $sqlRejected = "select id_c from contacts_cstm where id_c = '".$contactId."' and status_c = 'Rejected' and assigned_user_id='23fcf3fd-1d0e-bfce-dd15-5cffba732f9d'";
+      //echo  $sql1;
+      $resultRejected = $db->query($sqlRejected);
+      if($row2 = $db->fetchByAssoc($resultRejected) )
+      {
+	      $set_entry_parameters = array(
+	      	//session id
+	        "session" => $session_id,
+	        //The name of the module from which to retrieve records.
+	        "module_name" => "Contacts",
+	        //Record attributes
+	        "name_value_list" => array(
+	        	//to update a record, you will nee to pass in a record id as commented below
+	            array("name" => "status_c", "value" => $userStatus),
+	            array("name" => "drop_stage1_c", "value" => $dropStage),
+	            array("name" => "rejection_reason_c", "value" => $rejectionReason),
+	            array("name" => "id", "value" => $contactId),
+	        ),
+	      );
+
+	      $contactupdate = call("set_entry", $set_entry_parameters, $url);
+	      //echo $contactRecordId = $contactupdate->id;
+	      //echo "Record Updated Successfully";
+        $msg = array(
+          'Success' => true,
+          'Message' => 'Record Updated Successfully',
+        );
+	  }
+	  else
+	  {
+	  	$set_entry_parameters = array(
+	      	//session id
+	        "session" => $session_id,
+	        //The name of the module from which to retrieve records.
+	        "module_name" => "Contacts",
+	        //Record attributes
+	        "name_value_list" => array(
+	        	//to update a record, you will nee to pass in a record id as commented below
+	            array("name" => "status_c", "value" => $userStatus),
+	            array("name" => "drop_stage1_c", "value" => $dropStage),
+	            array("name" => "rejection_reason_c", "value" => $rejectionReason),
+	            array("name" => "assigned_user_id", "value" => '23fcf3fd-1d0e-bfce-dd15-5cffba732f9d'),
+	            array("name" => "id", "value" => $contactId),
+	        ),
+	      );
+
+	      $contactupdate = call("set_entry", $set_entry_parameters, $url);
+	      //echo $contactRecordId = $contactupdate->id;
+	      //echo "Record Updated Successfully";
+        $msg = array(
+          'Success' => true,
+          'Message' => 'Record Updated Successfully',
+        );
+	  }
+    }
+    else if($userStatus == 'Eligible')
+    {
+      $sql2 = "select id_c from contacts_cstm where (id_c = '".$contactId."' and status_c = 'Eligible') or (id_c='".$contactId."' and status_c='') or (id_c='".$contactId."' and status_c IS NULL)";
+      //echo  $sql1;
+      $result2 = $db->query($sql2);
+      if($row2 = $db->fetchByAssoc($result2) )
+      {
+        $set_entry_parameters = array(
+	    	//session id
+	        "session" => $session_id,
+	        //The name of the module from which to retrieve records.
+	        "module_name" => "Contacts",
+			//Record attributes
+	        "name_value_list" => array(
+	        	//to update a record, you will nee to pass in a record id as commented below
+	            array("name" => "status_c", "value" => $userStatus),
+	            array("name" => "drop_stage1_c", "value" => $dropStage),
+	            array("name" => "rejection_reason_c", "value" => $rejectionReason),
+	            array("name" => "id", "value" => $contactId),
+	        ),
+	      );
+
+  	    $contactupdate = call("set_entry", $set_entry_parameters, $url);
+  	    //echo $contactRecordId = $contactupdate->id;
+  	    //echo "Record Updated Successfully";
+        $msg = array(
+          'Success' => true,
+          'Message' => 'Record Updated Successfully',
+        );
+      }
+      else
+      {
+	      $assigned_user_id1 = '';
+	      $sql1 = "select before_value_string from contacts_audit where parent_id = '".$contactId."' and field_name = 'assigned_user_id' order by date_created DESC limit 1";
+	      //echo  $sql1;
+	      $result1 = $db->query($sql1);
+	      while($row = $db->fetchByAssoc($result1) )
+	      {
+	        $assigned_user_id1 = $row['before_value_string'];
+	      }
+
+	      if($assigned_user_id1 != '')
+	      {
+	      	$checkUserAvailable = "select id from users u JOIN users_cstm uc ON u.id = uc.id_c where u.status='Active'  AND uc.availability_status_c='Available' AND u.id = '".$assigned_user_id1."'";
+		      //echo  $sql1;
+		      $checkUserAvailableResult = $db->query($checkUserAvailable);
+		      if($row = $db->fetchByAssoc($checkUserAvailableResult) )
+		      {
+		        $set_entry_parameters = array(
+	             //session id
+	             "session" => $session_id,
+
+	             //The name of the module from which to retrieve records.
+	             "module_name" => "Contacts",
+
+	             //Record attributes
+	             "name_value_list" => array(
+	                  //to update a record, you will nee to pass in a record id as commented below
+	                  array("name" => "status_c", "value" => $userStatus),
+	                  array("name" => "drop_stage1_c", "value" => $dropStage),
+	                  array("name" => "rejection_reason_c", "value" => $rejectionReason),
+	                  array("name" => "assigned_user_id", "value" => $assigned_user_id1),
+	                  array("name" => "id", "value" => $contactId),
+	             ),
+	          );
+
+	          $contactupdate = call("set_entry", $set_entry_parameters, $url);
+    	      //echo $contactRecordId = $contactupdate->id;
+    	      //echo "Record Updated Successfully";
+            $msg = array(
+              'Success' => true,
+              'Message' => 'Record Updated Successfully',
+            );
+		      }		
+		      else
+		      {
+		      	$assigned_user_id_round_robin = '';
+		      	$target = $sugar_config['users_assignment_target'];
+					//~ $target = 2;
+					  $query = "SELECT distinct(su.user_id) FROM securitygroups sg JOIN securitygroups_users su ON su.securitygroup_id = sg.id JOIN users u ON su.user_id=u.id JOIN users_cstm uc ON u.id=uc.id_c JOIN acl_roles_users aru on aru.user_id=u.id and aru.deleted=0 WHERE sg.name IN('IFA Channel','CSC- Rajasthan emitra','External Outsourcing Agency (SAAR)','Operations Team,Sales Team','Product Team','Technology Team','Legal Team','Marketing Team','General Advisory Team','Offline Marketing','CSC- M.P Online','Corporate Channel','iOS APP','Android APP','5nance.com','Digital Marketing') AND u.status='Active'  AND uc.availability_status_c='Available' AND sg.deleted =0 AND su.deleted=0 AND u.deleted=0 and aru.role_id='a8ab8653-5860-d896-7a78-58466a429bee'";
+
+					  $result = $db->query($query);		
+					  $users_count = $result->num_rows;
+					  if($users_count > 0)
+            {
+						  $assigned_array=array();
+						  while($users_row = $db->fetchByAssoc($result))
+						  {
+							 $assigned_array[] = $users_row['user_id'];
+						  } 
+  						/*echo '<pre> Assigned Array';
+  						print_r($assigned_array);*/
+						  $today = date('Y-m-d');
+						  $assigned_user_count = array();
+						  $assigned_user_contacts_count = array();
+						  for($i=0;$i<sizeof($assigned_array);$i++)
+						  {
+							   $records_query = "SELECT count(c.id) as count FROM contacts c LEFT JOIN contacts_cstm cc ON c.id = cc.id_c	WHERE  c.deleted =0 AND c.assigned_user_id = '".$assigned_array[$i]."' AND (date(cc.user_allocation_date_c ) = '$today' OR disposition_c = '')";	
+							   $records_result = $db->query($records_query);
+							   $row_records_result = $db->fetchByAssoc($records_result);
+							   $assigned_user_count[] = $row_records_result['count'];
+                 $assigned_user_contacts_count[$row_records_result['count']] = $assigned_array[$i];
+						  }
+						  $get_least_count = min($assigned_user_count);
+						  if($get_least_count < $target)
+						  {
+							   $assigned_user_id_round_robin = $assigned_user_contacts_count[$get_least_count];
+							   if(empty($assigned_user_id_round_robin))
+							   {
+								    $assigned_user_id_round_robin=$assigned_array[array_rand($assigned_array)];
+							   }
+						  }
+						  else
+						  {
+							   $query_user = $db->query("select id from users where user_name='Dharmesh' and deleted=0");
+							   $result_user = $db->fetchByAssoc($query_user);
+							   $assigned_user_id_round_robin = $result_user['id'];
+						  }
+					  }
+            else
+            {
+						  $query_user = $db->query("select id from users where user_name='Dharmesh' and deleted=0");
+						  $result_user = $db->fetchByAssoc($query_user);
+						  $assigned_user_id_round_robin = $result_user['id'];
+					  }
+
+  					$set_entry_parameters = array(
+  	             //session id
+  	             "session" => $session_id,
+
+  	             //The name of the module from which to retrieve records.
+  	             "module_name" => "Contacts",
+
+  	             //Record attributes
+  	             "name_value_list" => array(
+  	                  //to update a record, you will nee to pass in a record id as commented below
+  	                  array("name" => "status_c", "value" => $userStatus),
+  	                  array("name" => "drop_stage1_c", "value" => $dropStage),
+  	                  array("name" => "rejection_reason_c", "value" => $rejectionReason),
+  	                  array("name" => "assigned_user_id", "value" => $assigned_user_id_round_robin),
+  	                  array("name" => "id", "value" => $contactId),
+  	             ),
+  	        );
+
+	          $contactupdate = call("set_entry", $set_entry_parameters, $url);
+	           //echo $contactRecordId = $contactupdate->id;
+	          //echo "Record Updated Successfully";
+            $msg = array(
+              'Success' => true,
+              'Message' => 'Record Updated Successfully',
+            );
+		      }
+	      }
+	      else
+        {
+          $set_entry_parameters = array(
+             //session id
+             "session" => $session_id,
+
+             //The name of the module from which to retrieve records.
+             "module_name" => "Contacts",
+
+             //Record attributes
+             "name_value_list" => array(
+                  //to update a record, you will nee to pass in a record id as commented below
+                  array("name" => "status_c", "value" => $userStatus),
+                  array("name" => "drop_stage1_c", "value" => $dropStage),
+                  array("name" => "rejection_reason_c", "value" => $rejectionReason),
+                  array("name" => "id", "value" => $contactId),
+             ),
+          );
+
+          $contactupdate = call("set_entry", $set_entry_parameters, $url);
+          //echo $contactRecordId = $contactupdate->id;
+          //echo "Record Updated Successfully";
+          $msg = array(
+            'Success' => true,
+            'Message' => 'Record Updated Successfully',
+          );
+        }
+      }
+    }
+    else
+    {
+      $set_entry_parameters = array(
+             //session id
+             "session" => $session_id,
+
+             //The name of the module from which to retrieve records.
+             "module_name" => "Contacts",
+
+             //Record attributes
+             "name_value_list" => array(
+                  //to update a record, you will nee to pass in a record id as commented below
+                  array("name" => "status_c", "value" => $userStatus),
+                  array("name" => "drop_stage1_c", "value" => $dropStage),
+                  array("name" => "rejection_reason_c", "value" => $rejectionReason),
+                  array("name" => "id", "value" => $contactId),
+             ),
+        );
+
+      $contactupdate = call("set_entry", $set_entry_parameters, $url);
+      //echo $contactRecordId = $contactupdate->id;
+      //echo "Record Updated Successfully";
+
+      $msg = array(
+        'Success' => true,
+        'Message' => 'Record Updated Successfully',
+      );
+    }
+
+    
+
+    /*if($contactRecordId)
+    {
+      if($userStatus == 'Rejected')
+      {
+        $sql = "update contacts set assigned_user_id = '2c4f63df-2fa6-039f-fc11-5ccc075c196c' where id = '".$contactId."'";
+        $result = $db->query($sql);
+      }
+    }*/
+  }
+  else{
+    //echo "Invalid Customer Record -> Customer ID not found in record";
+
+    $msg = array(
+          'Success' => false,
+          'Message' => 'Invalid Customer Record -> Customer ID not found in record',
+        );
+  }
+
+  echo json_encode($msg);
+
+  function call($method, $parameters, $url)
+    {
+
+        ob_start();
+        $curl_request = curl_init();
+
+        curl_setopt($curl_request, CURLOPT_URL, $url);
+        curl_setopt($curl_request, CURLOPT_POST, 1);
+        curl_setopt($curl_request, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_0);
+        curl_setopt($curl_request, CURLOPT_HEADER, 1);
+        curl_setopt($curl_request, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($curl_request, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl_request, CURLOPT_FOLLOWLOCATION, 0);
+
+        $jsonEncodedData = json_encode($parameters);
+
+        $post = array(
+             "method" => $method,
+             "input_type" => "JSON",
+             "response_type" => "JSON",
+             "rest_data" => $jsonEncodedData
+        );
+
+        curl_setopt($curl_request, CURLOPT_POSTFIELDS, $post);
+        $result = curl_exec($curl_request);
+        curl_close($curl_request);
+
+        $result = explode("\r\n\r\n", $result, 2);
+        $response = json_decode($result[1]);
+        ob_end_flush();
+
+        return $response;
+    }
+?>    

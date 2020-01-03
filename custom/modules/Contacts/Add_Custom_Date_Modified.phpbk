@@ -1,0 +1,19 @@
+<?php
+if(!defined('sugarEntry') || !sugarEntry) die('Not A Valid Entry Point');
+//ini_set('display_errors','On');
+class AddCustomDateModifiedClass {
+	public function AddCustomDateModifiedFunction($bean, $event, $arguments) {
+		global $db,$current_user;
+		if($current_user->id!=1){ 
+                $bean->custom_date_modified_c=$bean->date_modified;
+                $bean->user_id_c=$current_user->id;
+                $bean->save();
+              
+                }
+               
+             //   exit;
+			
+	}
+}
+
+?>

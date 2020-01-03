@@ -1,0 +1,15 @@
+<?php // created: Tue, 13 Jun 2017 10:55:10 +0000
+	$cacheFile = array (
+  'timestamp' => 1497351310,
+  'out' => 'a:1:{s:4:"meta";a:7:{s:4:"type";s:7:"inbound";s:3:"uid";s:23:"GmailId15c9c3c6ec105f7e";s:4:"ieId";s:36:"56d44a05-bfaf-d1bc-526f-593fbdf721ef";s:5:"email";a:11:{s:4:"name";s:29:"LMS and Ameyo Integration UAT";s:9:"from_name";s:38:"Anusha Konda <anusha@simplecrm.com.sg>";s:9:"from_addr";s:44:"Anusha Konda &lt;anusha@simplecrm.com.sg&gt;";s:10:"date_start";s:19:"2017-06-12 12:17:00";s:10:"time_start";s:0:"";s:10:"message_id";s:32:"66824c6d01f60357d602072b3401d12e";s:8:"cc_addrs";s:137:"Amit Mittal &lt;amit.mittal@5nance.com&gt;, Minjal Desai &lt;minjal@simplecrm.com.sg&gt;, Noresha Ankani &lt;noresha@simplecrm.com.sg&gt;";s:11:"attachments";s:0:"";s:7:"toaddrs";s:33:"S K Mohanty &lt;sk@5nance.com&gt;";s:11:"description";s:1524:"<div dir="ltr"><div class="gmail_default" style="color:#134f5c;">Dear SK, </div><div class="gmail_default" style="color:#134f5c;"><br /></div><div class="gmail_default" style="color:#134f5c;">As you aware, we completed development in LMS flow and Ameyo integration. </div><div class="gmail_default" style="color:#134f5c;"><br /></div><div class="gmail_default" style="color:#134f5c;">Could you please commit a date when can we get UAT signoff. <br /><br /></div><div class="gmail_default" style="color:#134f5c;">LMS UAT is going on from long time. Please help us to close this ASAP.</div><div><br /></div>-- <br /><div class="gmail_signature"><div dir="ltr"><div><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div><font color="#134f5c">Thanks &amp; Regards</font></div><div><font color="#134f5c">-------------------------------</font></div><div><font color="#134f5c">Anusha.K,</font></div><div><font color="#134f5c">Project Manager</font></div><div><font color="#134f5c"><br /></font></div><div><font color="#134f5c">Simpleworks Business Solutions Pte Ltd,</font></div><div><font color="#134f5c">60 Robinson Road #11-01, Bank of East Asia Building, Singapore 068892</font></div><div><font color="#134f5c"><a href="http://www.simplecrm.com.sg">www.simplecrm.com.sg</a></font></div><div><font size="1"><br /></font></div><div><font face="arial, helvetica, sans-serif" size="2" color="#134f5c">Direct Mobile No: +91 8939724063</font></div></div></div></div></div></div></div></div></div>
+</div>
+";s:13:"reply_to_addr";s:44:"Anusha Konda &lt;anusha@simplecrm.com.sg&gt;";}s:4:"mbox";s:5:"INBOX";s:2:"cc";s:286:"				<tr>
+					<td NOWRAP valign="top" class="displayEmailLabel">
+						CC:
+					</td>
+					<td class="displayEmailValue">
+						Amit Mittal &lt;amit.mittal@5nance.com&gt;, Minjal Desai &lt;minjal@simplecrm.com.sg&gt;, Noresha Ankani &lt;noresha@simplecrm.com.sg&gt;
+					</td>
+				</tr>";s:13:"is_sugarEmail";b:0;}}',
+);
+?>

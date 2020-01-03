@@ -1,0 +1,29 @@
+<?php 
+$app_list_strings['parent_type_display'] = array (
+  'Leads' => 'Lead',
+  'Cases' => 'Ticket',
+  'Accounts' => 'Related Corporate Account',
+);$app_list_strings['scrm_calls_campaignid_list'] = array (
+  'Invoage Inbound Campaign' => 'Invoage Inbound Campaign',
+  'Invoage Outbound Campaign' => 'Invoage Outbound Campaign',
+  'Campaign No 3' => 'Campaign No 3',
+  'Campaign No 4' => 'Campaign No 4',
+  'Campaign No 5' => 'Campaign No 5',
+);$app_list_strings['scrm_calls_dispositioncode_list'] = array (
+  '' => '',
+  'Sale' => 'Sale',
+  'Others' => 'Others',
+  'Abruptdisconnection' => 'Abruptdisconnection',
+);$app_list_strings['scrm_calls_calltype_list2'] = array (
+  '' => '',
+  'inbound.call.dial' => 'Inbound Call Dial',
+  'outbound.auto.dial' => 'Outbound Call Dial',
+  'outbound.callback.dial' => 'Outbound Callback Dial',
+  'outbound.auto.preview.dial' => 'Outbound Auto Preview Dial',
+  'outbound.manual.dial' => 'Outbound Manual Dial',
+  'outbound.manual.preview.dial' => 'Outbound Manual Preview Dial',
+  'click.to.call.dial' => 'Click to Dial Call',
+  'auto.dial.customer' => 'Auto Dial',
+  'inbound.dial.customer' => 'Inbound Call',
+  'manual.dial.customer' => 'Manual Dial And Transefer to user',
+);

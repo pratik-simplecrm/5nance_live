@@ -1,0 +1,13 @@
+<?php // created: Tue, 13 Jun 2017 10:33:40 +0000
+	$cacheFile = array (
+  'timestamp' => 1497350020,
+  'out' => 'a:1:{s:4:"meta";a:7:{s:4:"type";s:7:"inbound";s:3:"uid";s:23:"GmailId15c9c5babdcfc10a";s:4:"ieId";s:36:"56d44a05-bfaf-d1bc-526f-593fbdf721ef";s:5:"email";a:11:{s:4:"name";s:54:"This is your chance to save Rs. 50,000 on ITM EEC Fees";s:9:"from_name";s:54:"ITM Executive Education Center <eecadmissions@itm.edu>";s:9:"from_addr";s:60:"ITM Executive Education Center &lt;eecadmissions@itm.edu&gt;";s:10:"date_start";s:19:"2017-06-12 12:51:00";s:10:"time_start";s:0:"";s:10:"message_id";s:32:"c48a4ae080fa810f944d765dff1eaf89";s:8:"cc_addrs";N;s:11:"attachments";s:0:"";s:7:"toaddrs";s:24:"noresha@simplecrm.com.sg";s:11:"description";s:1821:"<table align="center" border="0" cellpadding="0" cellspacing="0" style="border:solid 1px #3b3636;" width="600"><tbody><tr><td><a href="http://lnk.panela.itmpgdm.in/ltrack?id=KRpRVggGAA1QAkgFAAEFBFFSBR8=BFAGBVUBB0hZX0ddEg4AJktfXkQKVFdHXR9WWQxPRgQ=&amp;client=9782&amp;c=0000"><img alt="" height="462" src="https://www.itm.edu/Mails/ITMEECJC1-2017/images/Header.jpg" width="600" /></a></td>
+</tr><tr><td style="font-family:arial;font-size:20px;color:#2d2c2c;text-align:center;padding:20px;">Executive MBA fees are being revised fro<br /><strong>₹ 1,85,000/-</strong> to<strong> ₹ 2,35,000/-</strong>.<br />
+Students who apply before<br /><strong>1st JULY 2017</strong> stand to save<br /><strong>₹ 50000/-</strong><br />
+so act up now andapply today itself.<strong> HURRY!!!</strong></td>
+</tr><tr><td align="center" style="padding-bottom:20px;"><a href="http://lnk.panela.itmpgdm.in/ltrack?id=KRpRVggGAA1QAkgFAAEFBFFSBR8=BFAGBVUBB0hZX0ddEg4AJktfXkQKVFdHXR9WWQxPRgQ=&amp;client=9782&amp;c=0000"><img alt="" height="36" src="https://www.itm.edu/Mails/ITMEECJC1-2017/images/Apply-now.jpg" width="146" /></a></td>
+</tr><tr><td style="font-family:arial;font-size:15px;background:#3b3636;color:#fff;text-align:center;padding:10px;"><strong style="font-size:18px;">Toll free No: 1800 209 972</strong><br />
+Bangalore I Chennai I Mumbai I Navi Mumbai I Nashik I New Delhi</td>
+</tr></tbody></table><br /><div><p>--<br />Not interested anymore? <a href="http://lnk.panela.itmpgdm.in/ltrack?id=KRpRVggGBwRRA0gFAAEFBFFSBR8=BFAGBVUBB0hZX0ddEg4AJktfXkQKVFdHXR9WWQxPRgQ=&amp;client=9782&amp;c=0000">Unsubscribe instantly</a><br /><br /></p></div><img border="0" src="http://lnk.panela.itmpgdm.in/ltrack?m=2030&amp;u=f179e3e7980faba34f260d2c70342cd3&amp;client=9782&amp;c=0000" alt="ltrack?m=2030&amp;u=f179e3e7980faba34f260d2c" />";s:13:"reply_to_addr";s:60:"ITM Executive Education Center &lt;eecadmissions@itm.edu&gt;";}s:4:"mbox";s:5:"INBOX";s:2:"cc";s:0:"";s:13:"is_sugarEmail";b:0;}}',
+);
+?>

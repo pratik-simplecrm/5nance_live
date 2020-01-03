@@ -1,0 +1,4 @@
+<?php
+//THIS FILE IS AUTO GENERATED, DO NOT MODIFY
+$mod_strings['LBL_ACCOUNTS_LEADS_1_FROM_ACCOUNTS_TITLE'] = 'Related Corporate Accounts';
+$mod_strings['LBL_LEADS_SCRM_CAMPAIGN_SOURCE_1_FROM_SCRM_CAMPAIGN_SOURCE_TITLE'] = 'Campaign Source';

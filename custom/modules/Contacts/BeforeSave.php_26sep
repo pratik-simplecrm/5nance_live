@@ -1,0 +1,127 @@
+<?php
+if(!defined('sugarEntry') || !sugarEntry) die('Not A Valid Entry Point');
+//~ ini_set("display_errors","On");
+
+class BeforeSave {
+	
+	public function change_sales_stage_for_disposition(&$bean, $event, $args) {
+		global $db, $app_list_strings,$sugar_config;
+			/*******************extract month from date_entered**************/
+		$date_created = $bean->fetched_row['date_entered'];
+		if(!isset($date_created)){
+			$date_created = $bean->date_entered;
+		}
+		$month = date("F", strtotime($date_created));
+		$bean->investor_acct_creation_month_c = $month;
+		
+		if(isset($bean->dateofactivation_c)){
+			$activation_date = $bean->dateofactivation_c;
+		}else{
+			$activation_date = $bean->fetched_row['dateofactivation_c'];
+		}
+		if(!empty($activation_date) && $activation_date!= '0000-00-00 00:00:00'){
+			$activation_date = date('Y-m-d H:i:s',strtotime('+5 hours +30 minutes',strtotime($activation_date)));
+			$month_activation = date("F", strtotime($activation_date));
+			$bean->account_activation_month_c = $month_activation;
+		}
+		
+		//Edited by noresha
+		/******************Round Robin user Assignment Start here***********************/
+		if(empty($bean->fetched_row) && $bean->created_by == '1')
+		{
+			$gateway_c = $bean->gateway_c;
+			if($gateway_c == 'CSC- M.P Online'){ 
+					$target = $sugar_config['users_assignment_target'];
+					$query = "SELECT su.user_id	FROM securitygroups sg JOIN securitygroups_users su ON su.securitygroup_id = sg.id JOIN users u ON su.user_id=u.id JOIN users_cstm uc ON u.id=uc.id_c AND su.deleted =0 WHERE sg.name = '$gateway_c' AND sg.deleted =0 AND su.deleted=0 AND u.deleted=0 AND uc.gateway_assigned_c='1'";
+					$result = $db->query($query);		
+					$users_count = $result->num_rows;
+					if($users_count > 0){
+						$assigned_array=array();
+						while($users_row = $db->fetchByAssoc($result))
+						{
+							$assigned_array[] = $users_row['user_id'];
+						} 
+						$today = gmdate('Y-m-d');
+						$assigned_user_count = array();
+						$assigned_user_contacts_count = array();
+						for($i=0;$i<sizeof($assigned_array);$i++)
+						{
+							$records_query = "SELECT count(c.id) as count FROM contacts c LEFT JOIN contacts_cstm cc ON c.id = cc.id_c	WHERE  cc.sales_stage_c	IN ('User', 'Suspect', 'Prospect', 'Hot Prospect') AND c.deleted =0 AND c.assigned_user_id = '".$assigned_array[$i]."' AND date(cc.user_allocation_date_c)='$today'";	
+							$records_result = $db->query($records_query);
+							$row_records_result = $db->fetchByAssoc($records_result);
+							$assigned_user_count[] = $row_records_result['count'];
+							$assigned_user_contacts_count[$row_records_result['count']] = $assigned_array[$i];
+						}
+						$get_least_count = min($assigned_user_count);
+						if($get_least_count < $target)
+						{
+							$assigned_user_id = $assigned_user_contacts_count[$get_least_count];
+							if(empty($assigned_user_id))
+							{
+								$assigned_user_id=$assigned_array[array_rand($assigned_array)];
+							}
+						}
+						else
+						{
+							$query_user = $db->query("select id from users where user_name='Poorti' and deleted=0");
+							$result_user = $db->fetchByAssoc($query_user);
+							$assigned_user_id = $result_user['id'];
+						}
+					}else{
+						$query_user = $db->query("select id from users where user_name='Poorti' and deleted=0");
+						$result_user = $db->fetchByAssoc($query_user);
+						$assigned_user_id = $result_user['id'];
+					}
+				}else if($gateway_c == 'Corporate Channel'){
+					$assigned_user_id = '57e19938-1ed8-d430-3bb4-589c568083ad';
+				}else{
+					$query_user = $db->query("select id from users where user_name='Poorti' and deleted=0");
+					$result_user = $db->fetchByAssoc($query_user);
+					$assigned_user_id = $result_user['id'];
+			}
+			$bean->assigned_user_id = $assigned_user_id;
+		}
+	/****************************End of User Assignment**********************************/
+		
+		 $assigned_user_id_fetched = $bean->fetched_row['assigned_user_id'];
+		 $assigned_user_id = $bean->assigned_user_id;
+		 
+		 if(strcmp($assigned_user_id , $assigned_user_id_fetched) != 0) {
+			$user_allocation_date_c = date("Y-m-d H:i:s");
+			//$user_allocation_date_c = date("Y-m-d H:i:s", strtotime("-5 hours, -30 minutes", strtotime($user_allocation_date_c)));
+			$bean->user_allocation_date_c = $user_allocation_date_c;
+		}
+		
+		$sales_stage = $bean->sales_stage_c; echo "<br>";
+		$sales_option = str_replace(" ", "_", $sales_stage);
+		
+		$disposition = $bean->disposition_c;
+		
+		$disposition_list = $app_list_strings['disposition_'.$sales_option.'_list'];
+		$sales_stage_dropped_list = $app_list_strings['sales_stage__Dropped_'.$sales_option.'_list'];
+		//~ echo "<pre>";
+		//~ print_r($sales_stage_dropped_list);
+		
+		
+		$sales_stage__Moves_to_Customer_list = $app_list_strings['sales_stage__Moves_to_Customer_list'];
+		$sales_stage__moves_to_Hot_Prospect_list = $app_list_strings['sales_stage__moves_to_Hot_Prospect_list'];
+		$sales_stage__moves_to_Prospect_list = $app_list_strings['sales_stage__moves_to_Prospect_list'];
+		$sales_stage__moves_to_Suspect_list = $app_list_strings['sales_stage__moves_to_Suspect_list'];
+		
+		if(in_array($disposition, $sales_stage_dropped_list)) {
+			$bean->sales_stage_c = 'Dropped '.$sales_stage;
+		} else if(in_array($disposition, $sales_stage__Moves_to_Customer_list)) {
+			$bean->sales_stage_c = 'Customer';
+		} else if(in_array($disposition, $sales_stage__moves_to_Hot_Prospect_list)) {
+			if($bean->sales_stage_c == 'Suspect' && $diposition == 'B2B2C- Interested in conversion to transacting partner'){
+				$bean->sales_stage_c = 'Prospect';
+			} else {
+				$bean->sales_stage_c = 'Hot Prospect';
+			}
+		} else if(in_array($disposition, $sales_stage__moves_to_Prospect_list)) {
+			$bean->sales_stage_c = 'Prospect';
+		} else if(in_array($disposition, $sales_stage__moves_to_Suspect_list)) {
+			$bean->sales_stage_c = 'Suspect';
+		}
+	}
+}

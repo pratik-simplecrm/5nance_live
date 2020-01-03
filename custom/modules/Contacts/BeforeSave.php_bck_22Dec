@@ -1,0 +1,95 @@
+<?php
+if(!defined('sugarEntry') || !sugarEntry) die('Not A Valid Entry Point');
+//~ ini_set("display_errors","On");
+
+class BeforeSave {
+	
+	public function change_sales_stage_for_disposition(&$bean, $event, $args) {
+		global $db, $app_list_strings;
+		
+		if(empty($bean->fetched_row) && $bean->created_by == '1')
+		{
+		//Round Robin user Assignment Start here
+		$gateway_c = $bean->gateway_c;
+		
+		$query = "SELECT su.user_id
+					FROM securitygroups sg
+					JOIN securitygroups_users su ON su.securitygroup_id = sg.id
+					AND su.deleted =0
+					WHERE sg.name = '$gateway_c'
+					AND sg.deleted =0";
+		$result = $db->query($query);
+		
+		$users_count = $result->num_rows;
+		
+		$records_query = "SELECT id
+					FROM contacts c
+					JOIN contacts_cstm cc ON c.id = cc.id_c
+					WHERE cc.gateway_c = '$gateway_c'
+					AND cc.sales_stage_c
+					IN (
+					'User', 'Suspect', 'Prospect', 'Hot Prospect'
+					)
+					AND c.deleted =0";
+					
+		$records_result = $db->query($records_query);
+		$records_count = $records_result->num_rows;
+		
+		$rr_id = $records_count % $users_count;
+		
+		$query = "SELECT suaru.scrm_user_assignment_rule_usersusers_ida AS user_id
+					FROM scrm_user_assignment_rule_users_c suaru
+					JOIN scrm_user_assignment_rule suar ON suar.id = suaru.scrm_user_assignment_rule_usersscrm_user_assignment_rule_idb
+					WHERE suar.name = '$gateway_c'
+					AND suar.round_robin_id = $rr_id
+					AND suar.deleted =0";
+		$result = $db->query($query);
+		
+		while($row = $db->fetchByAssoc($result)){
+			$bean->assigned_user_id = $row['user_id'];
+		}
+	}
+		//End of RR
+		
+		 $assigned_user_id_fetched = $bean->fetched_row['assigned_user_id'];
+		 $assigned_user_id = $bean->assigned_user_id;
+		 
+		 if(strcmp($assigned_user_id , $assigned_user_id_fetched) != 0) {
+			$user_allocation_date_c = date("Y-m-d H:i:s");
+			$user_allocation_date_c = date("Y-m-d H:i:s", strtotime("-5 hours, -30 minutes", strtotime($user_allocation_date_c)));
+			$bean->user_allocation_date_c = $user_allocation_date_c;
+		}
+		
+		$sales_stage = $bean->sales_stage_c; echo "<br>";
+		$sales_option = str_replace(" ", "_", $sales_stage);
+		
+		$disposition = $bean->disposition_c;
+		
+		$disposition_list = $app_list_strings['disposition_'.$sales_option.'_list'];
+		$sales_stage_dropped_list = $app_list_strings['sales_stage__Dropped_'.$sales_option.'_list'];
+		//~ echo "<pre>";
+		//~ print_r($sales_stage_dropped_list);
+		
+		
+		$sales_stage__Moves_to_Customer_list = $app_list_strings['sales_stage__Moves_to_Customer_list'];
+		$sales_stage__moves_to_Hot_Prospect_list = $app_list_strings['sales_stage__moves_to_Hot_Prospect_list'];
+		$sales_stage__moves_to_Prospect_list = $app_list_strings['sales_stage__moves_to_Prospect_list'];
+		$sales_stage__moves_to_Suspect_list = $app_list_strings['sales_stage__moves_to_Suspect_list'];
+		
+		if(in_array($disposition, $sales_stage_dropped_list)) {
+			$bean->sales_stage_c = 'Dropped '.$sales_stage;
+		} else if(in_array($disposition, $sales_stage__Moves_to_Customer_list)) {
+			$bean->sales_stage_c = 'Customer';
+		} else if(in_array($disposition, $sales_stage__moves_to_Hot_Prospect_list)) {
+			if($bean->sales_stage_c == 'Suspect' && $diposition == 'B2B2C- Interested in conversion to transacting partner'){
+				$bean->sales_stage_c = 'Prospect';
+			} else {
+				$bean->sales_stage_c = 'Hot Prospect';
+			}
+		} else if(in_array($disposition, $sales_stage__moves_to_Prospect_list)) {
+			$bean->sales_stage_c = 'Prospect';
+		} else if(in_array($disposition, $sales_stage__moves_to_Suspect_list)) {
+			$bean->sales_stage_c = 'Suspect';
+		}
+	}
+}

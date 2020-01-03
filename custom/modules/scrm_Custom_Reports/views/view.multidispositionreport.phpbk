@@ -1,0 +1,532 @@
+<?php
+
+if (!defined('sugarEntry'))
+    define('sugarEntry', true);
+require_once('include/SugarCharts/SugarChartFactory.php');
+require_once('config.php');
+
+class scrm_Custom_ReportsViewmultidispositionreport extends SugarView {
+
+    private $chartV;
+
+    function __construct() {
+        parent::SugarView();
+    }
+
+    function display() {
+        global $sugar_config, $db;
+        $url = $sugar_config['site_url'];
+        $current_date = date('d/m/Y');
+        $start_date = date('01/m/Y');
+        //Fetch Gateway
+         $Gateway = '';
+        if(!empty($GLOBALS['app_list_strings']['gateway_list']))
+        {
+            foreach($GLOBALS['app_list_strings']['gateway_list'] as $key => $val)
+            {
+                $flag = true;
+                if(!empty($_REQUEST['Gateway']))
+                {
+                    
+                    foreach($_REQUEST['Gateway'] as $b_id )
+                    {
+                        if($b_id == $key ) {
+                            $val= $val;
+                            $Gateway .= '<option label="'.$val.'" value="'.$key.'" selected >' ;
+                            $Gateway .= $val;
+                            $Gateway .= '</option>';
+                            $flag  = false;
+                            break;
+                        } 
+                    }
+                }
+                if($flag) {
+                    $val = ucwords($val);    
+                    $Gateway .= '<option label="'.$val.'" value="'.$key.'" >' ;
+                    $Gateway .= $val;
+                    $Gateway .= '</option>';
+                }
+            }
+        }
+
+
+        echo '<link rel="stylesheet" href="custom/modules/scrm_Custom_Reports/Report.css" type="text/css">';
+
+
+
+        echo '<!DOCTYPE html>
+<html lang="en">
+
+<body>
+
+<form name = "run" method = "post" action = "">
+<br><br><br><br><center>
+<h2 style="font-size: 22px;color: #181818;">Multi Disposition Report</h2>
+</center>
+<div style = "padding:22px; width:100%; background-color:#EEE;">
+<br>
+
+ <table><tr><td><strong>From: </strong><input type = "text" name = "from_date" id = "from_date" value="' . $_POST["from_date"] . '">&nbsp;<img border="0" src="themes/SuiteR/images/jscalendar.gif" id="fromb" align="absmiddle" />
+					<script type="text/javascript">
+						Calendar.setup({inputField   : "from_date",
+						ifFormat      :    "%d/%m/%Y", 
+						button       : "fromb",
+						align        : "right"});
+					</script></td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><td><strong>To: </strong><input type = "text" name = "to_date" id = "to_date" value="' . $_POST["to_date"] . '">&nbsp;<img border="0" src="themes/SuiteR/images/jscalendar.gif" id="tob" align="absmiddle" />
+					<script type="text/javascript">
+						Calendar.setup({inputField   : "to_date",
+						ifFormat      :    "%d/%m/%Y", 
+						button       : "tob",
+						align        : "right"});
+					</script></td>
+</td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><td><strong>Gateway (Source): </strong>
+&nbsp;<select id="Gateway[]" name="Gateway[]" >'.$Gateway.'</select>
+
+</td>                                        
+
+</tr></table>
+
+<br><br><br>
+
+ 
+  <button type="submit" name="state" id ="submit" class="btn btn-primary">Run</button>
+&nbsp&nbsp&nbsp&nbsp
+<span id="clear"  class="btn btn-primary">Clear</span> 
+&nbsp&nbsp&nbsp&nbsp<button type="submit" id="Export" name="Export" value="Export"  class="btn btn-primary">Export</button> 
+<br>
+</div>
+
+
+</form>
+</body>
+   <script>
+  $(document).ready(function(){
+	 
+	});
+  </script>
+</html>';
+
+
+
+        $data = '';
+
+        $rows_list = $this->getContactsData();
+
+        foreach ($rows_list as $row) {
+            $data .= '<tr>';
+            $data .= '<td>' . $row['unique_customer_code_c'] . '</td>';
+            $data .= '<td>' . $row['first_name'] . '</td>';
+            $data .= '<td>' . $row['last_name'] . '</td>';
+            $data .= '<td>' . $row['email_address'] . '</td>';
+            $data .= '<td>' . $row['phone_mobile'] . '</td>';
+            $data .= '<td>' . $row['gateway_c'] . '</td>';
+            $data .= '<td>' . $row['campaign_type_c'] . '</td>';
+            $data .= '<td>' . $row['user_name'] . '</td>';
+            $data .= '<td>' . $row['product_interest_c'] . '</td>';
+            $data .= '<td>' . $row['product_sub_type_interest_c'] . '</td>';
+            $data .= '<td>' . $row['date_entered'] . '</td>';
+            $data .= '<td>' . $row['user_allocation_date_c'] . '</td>';
+            $data .= '<td>' . $row['assignment_tat'] . '</td>';
+            $data .= '<td>' . $row['sales_stage_c'] . '</td>';
+            $data .= '<td>' . $row['next_call_planning_comments_c'] . '</td>';
+
+            $data .= '<td>' . $row['disposition1'] . '</td>';
+            $data .= '<td>' . $row['first_call_tat'] . '</td>';
+            $data .= '<td>' . $row['disposition1_date_time'] . '</td>';
+            $data .= '<td>' . $row['disposition2'] . '</td>';
+            $data .= '<td>' . $row['disposition2_date_time'] . '</td>';
+            $data .= '<td>' . $row['disposition3'] . '</td>';
+            $data .= '<td>' . $row['disposition3_date_time'] . '</td>';
+            $data .= '<td>' . $row['disposition4'] . '</td>';
+            $data .= '<td>' . $row['disposition4_date_time'] . '</td>';
+            $data .= '<td>' . $row['disposition5'] . '</td>';
+            $data .= '<td>' . $row['disposition5_date_time'] . '</td>';
+            $data .= '<td>' . $row['disposition6'] . '</td>';
+            $data .= '<td>' . $row['disposition6_date_time'] . '</td>';
+            $data .= '<td>' . $row['disposition7'] . '</td>';
+            $data .= '<td>' . $row['disposition7_date_time'] . '</td>';
+            $data .= '<td>' . $row['disposition8'] . '</td>';
+            $data .= '<td>' . $row['disposition8_date_time'] . '</td>';
+            $data .= '<td>' . $row['disposition9'] . '</td>';
+            $data .= '<td>' . $row['disposition9_date_time'] . '</td>';
+            $data .= '<td>' . $row['disposition10'] . '</td>';
+            $data .= '<td>' . $row['disposition10_date_time'] . '</td>';
+            $data .= '<td>' . $row['end_to_end_tat'] . '</td>';
+            $data .= '</tr>';
+        }
+
+        //~ echo '<pre>';
+        //~ print_r($data);
+        //~ 
+        echo $html = <<<HTML
+		<!DOCTYPE html>
+<html>
+<head>
+	<style>
+	td,th
+	{ text-align:center;}
+	</style>
+	<link rel="stylesheet" type="text/css" href="custom/modules/scrm_Custom_Reports/DataTable/jquery.dataTables.css">
+	<link rel="stylesheet" type="text/css" href="custom/modules/scrm_Custom_Reports/DataTable/dataTables.colReorder.css">
+	<link rel="stylesheet" type="text/css" href="custom/modules/scrm_Custom_Reports/DataTable/shCore.css">
+	<link rel="stylesheet" type="text/css" href="custom/modules/scrm_Custom_Reports/DataTable/demo.css">
+	<style type="text/css" class="init">
+
+	</style>
+	<script type="text/javascript" language="javascript" src="custom/modules/scrm_Custom_Reports/DataTable/jquery.js"></script>
+	<script type="text/javascript" language="javascript" src="custom/modules/scrm_Custom_Reports/DataTable/jquery.dataTables.js"></script>
+	<script type="text/javascript" language="javascript" src="custom/modules/scrm_Custom_Reports/DataTable/dataTables.colReorder.js"></script>
+	<script type="text/javascript" language="javascript" src="custom/modules/scrm_Custom_Reports/DataTable/shCore.js"></script>
+	<script type="text/javascript" language="javascript" src="custom/modules/scrm_Custom_Reports/DataTable/demo.js"></script>
+	<script type="text/javascript" language="javascript" class="init">
+
+
+$(document).ready(function() {
+	$('#example').DataTable( {
+		dom: 'Rlfrtip'
+	} );
+} );
+
+
+	</script>
+</head>
+
+<body class="dt-example">
+	<div class="col-sm-12" style="padding-top:12px;margin-left: 0px;">
+		<section>
+			
+                        <div class="table-responsive">
+			<table id="example" class="table table-bordered table-striped " cellspacing="0" width="100%">
+				<thead>
+					<tr height="20">
+        
+                       
+                  <th data-toggle="true" scope="col">
+            				<div align="left" width="100%" style="white-space: normal;">Lead ID </th></div>			
+			<th data-toggle="true" scope="col">
+            				<div align="left" width="100%" style="white-space: normal;">First Name</th></div>			
+			<th data-toggle="true" scope="col">
+            				<div align="left" width="100%" style="white-space: normal;">Last Name</th></div>			
+			<th data-toggle="true" scope="col">
+            				<div align="left" width="100%" style="white-space: normal;">Email Address</th>	</div>		
+			<th data-toggle="true" scope="col">
+            				<div align="left" width="100%" style="white-space: normal;">Mobile Number</th></div>
+			<th data-toggle="true" scope="col">
+            				<div align="left" width="100%" style="white-space: normal;">Gateway (Source)</th></div>
+			<th data-toggle="true" scope="col">
+            				<div align="left" width="100%" style="white-space: normal;">Campaign Type</th>		</div>	
+			<th data-toggle="true" scope="col">
+            				<div align="left" width="100%" style="white-space: normal;">Sales Advisor</th>	</div>
+			<th data-toggle="true" scope="col">
+            				<div align="left" width="100%" style="white-space: normal;">Product Interest</th>	</div>
+			<th data-toggle="true" scope="col">
+            				<div align="left" width="100%" style="white-space: normal;">Product Sub Interest</th>	</div>
+			<th data-toggle="true" scope="col">
+            				<div align="left" width="100%" style="white-space: normal;">User Creation Date</th>	</div>
+            <th data-toggle="true" scope="col">
+            				<div align="left" width="100%" style="white-space: normal;">Advisor Assignment Date/Time </th></div>			
+			<th data-toggle="true" scope="col">
+            				<div align="left" width="100%" style="white-space: normal;">Assignment TAT</th></div>			
+			<th data-toggle="true" scope="col">
+            				<div align="left" width="100%" style="white-space: normal;">Sales Stage</th></div>			
+			<th data-toggle="true" scope="col">
+            				<div align="left" width="100%" style="white-space: normal;">Comments</th>	</div>		
+			<th data-toggle="true" scope="col">
+            				<div align="left" width="100%" style="white-space: normal;">Latest Disposition 1</th></div>
+			<th data-toggle="true" scope="col">
+            				<div align="left" width="100%" style="white-space: normal;">First Call TAT</th></div>
+			<th data-toggle="true" scope="col">
+            				<div align="left" width="100%" style="white-space: normal;">Date & Time</th>		</div>	
+			<th data-toggle="true" scope="col">
+            				<div align="left" width="100%" style="white-space: normal;">Disposition 2</th>	</div>
+			<th data-toggle="true" scope="col">
+            				<div align="left" width="100%" style="white-space: normal;">Date & Time</th>	</div>
+			<th data-toggle="true" scope="col">
+            				<div align="left" width="100%" style="white-space: normal;">Disposition 3</th>	</div>
+			<th data-toggle="true" scope="col">
+            				<div align="left" width="100%" style="white-space: normal;">Date & Time</th>	</div>
+            <th data-toggle="true" scope="col">
+            				<div align="left" width="100%" style="white-space: normal;">Disposition 4</th>	</div>
+			<th data-toggle="true" scope="col">
+            				<div align="left" width="100%" style="white-space: normal;">Date & Time</th>	</div>
+            <th data-toggle="true" scope="col">
+            				<div align="left" width="100%" style="white-space: normal;">Disposition 5</th>	</div>
+			<th data-toggle="true" scope="col">
+            				<div align="left" width="100%" style="white-space: normal;">Date & Time</th>	</div>
+            <th data-toggle="true" scope="col">
+            				<div align="left" width="100%" style="white-space: normal;">Disposition 6</th>	</div>
+			<th data-toggle="true" scope="col">
+            				<div align="left" width="100%" style="white-space: normal;">Date & Time</th>	</div>
+            <th data-toggle="true" scope="col">
+            				<div align="left" width="100%" style="white-space: normal;">Disposition 7</th>	</div>
+			<th data-toggle="true" scope="col">
+            				<div align="left" width="100%" style="white-space: normal;">Date & Time</th>	</div>
+            <th data-toggle="true" scope="col">
+            				<div align="left" width="100%" style="white-space: normal;">Disposition 8</th>	</div>
+			<th data-toggle="true" scope="col">
+            				<div align="left" width="100%" style="white-space: normal;">Date & Time</th>	</div>
+            <th data-toggle="true" scope="col">
+            				<div align="left" width="100%" style="white-space: normal;">Disposition 9</th>	</div>
+			<th data-toggle="true" scope="col">
+            				<div align="left" width="100%" style="white-space: normal;">Date & Time</th>	</div>
+            <th data-toggle="true" scope="col">
+            				<div align="left" width="100%" style="white-space: normal;">Disposition 10</th>	</div>
+			<th data-toggle="true" scope="col">
+            				<div align="left" width="100%" style="white-space: normal;">Date & Time</th>	</div>
+            <th data-toggle="true" scope="col">
+            				<div align="left" width="100%" style="white-space: normal;">End to End TAT</th>	</div>
+		    </tr>
+				</thead>
+
+
+				<tbody>
+			$data
+				</tbody>
+			</table>
+                </div>
+
+			
+				</div>
+
+			</div>
+		</section>
+	</div>
+
+</body>
+</html>
+	   <script>
+  $(document).ready(function(){
+	var from_date = $("#from_date").val();
+	var to_date = $("#to_date").val();
+	var current_date = '$current_date';
+	var start_date = '$start_date';
+	if((from_date=="")&&(to_date==""))
+	{
+	  $("#from_date").val(start_date);
+	  $("#to_date").val(current_date);
+	}   
+	  
+  	$("#clear").on("click",function(){
+			$("#from_date").val("");
+			$("#to_date").val("");
+			return false;
+		
+		});
+	});	
+	</script>
+HTML;
+        echo $_POST['Export'];
+        echo $_REQUEST['Export'];
+        if (!empty($_POST['Export'])) {
+            $timestamp = date('Y_m_d_His');
+            ob_end_clean();
+            ob_start();
+            // output headers so that the file is downloaded rather than displayed
+            header('Content-Type: text/csv; charset=utf-8');
+            header("Content-Disposition: attachment; filename=Multidispositionreport{$timestamp}.csv");
+
+            // create a file pointer connected to the output stream
+            $output = fopen('php://output', 'w');
+
+            fputcsv($output, array('Lead ID','First Name','Last Name','Email Address','Mobile Number','Gateway (Source)','Campaign Type','Sales Advisor','Product Interest','Product Sub Interest','User Creation Date','Advisor Assignment Date/Time','Assignment TAT','Sales Stage','Comments','Latest Disposition 1','First Call TAT','Date & Time','Disposition 2','Date & Time','Disposition 3','Date & Time','Disposition 4','Date & Time','Disposition 5','Date & Time','Disposition 6','Date & Time','Disposition 7','Date & Time','Disposition 8','Date & Time','Disposition 9','Date & Time','Disposition 10','Date & Time','End to End TAT'));
+            foreach ($rows_list as $v) {
+                unset($v['from_date']);
+                unset($v['to_date']);
+
+                fputcsv($output, $v);
+            }
+            exit;
+        }
+    }
+
+    function getContactsData() {
+
+        global $db, $current_user;
+
+        //~ $to_date = date("Y-m-d");
+        //~ $from_date = date("Y-m-d", strtotime("-1 month", strtotime($to_date)));
+        $to_date = $_POST['to_date'];
+        $from_date = $_POST['from_date'];
+        $gateway = $_POST['Gateway'];
+        if (empty($to_date) && empty($from_date)) {
+            $to_date = date("d/m/Y");
+            $from_date = date("m/Y");
+            $from_date = "01/" . $from_date;
+        }
+
+        if (!empty($from_date)) {
+            $fdate = explode('/', $from_date);
+            $from_date = $fdate[2] . "-" . $fdate[1] . "-" . $fdate[0] . " " . $current_time;
+            $from_date = $from_date . " 00:00:00";
+
+            $from_date = date('Y-m-d H:i:s', strtotime('-5 hours', strtotime($from_date)));
+            $from_date = date('Y-m-d H:i:s', strtotime('-30 minutes', strtotime($from_date)));
+
+//			 $from_date = " and c.date_entered >= '$from_date' ";
+        }
+
+        if (!empty($to_date)) {
+            $fdate = explode('/', $to_date);
+            $to_date = $fdate[2] . "-" . $fdate[1] . "-" . $fdate[0] . " " . $current_time;
+            $to_date = $to_date . " 23:59:59";
+
+            $to_date = date('Y-m-d H:i:s', strtotime('-5 hours', strtotime($to_date)));
+            $to_date = date('Y-m-d H:i:s', strtotime('-30 minutes', strtotime($to_date)));
+
+            // $to_date = " and c.date_entered <= '$to_date' ";
+        }
+        if (!empty($gateway)) {
+          if(is_array($gateway)){
+                $tmp = '';
+                foreach($gateway as $b_id)
+                {
+                    if(!empty($b_id)) { 
+                        if(empty($tmp))
+                            $tmp  = "'".$b_id."'";
+                        else    
+                            $tmp .= ",'".$b_id."'";
+                    }
+                }
+                if(!empty($tmp))
+                    $gateway = "and cc.gateway_c in ($tmp)";
+                else
+                    $gateway = '';
+            } 
+        }       
+          
+
+        $date_filter = " c.date_entered BETWEEN '$from_date' AND '$to_date' $gateway";
+
+       
+        //fetch user role
+        $select_role_query = "select id from contacts where deleted=0";
+        $select_role = $db->query($select_role_query);
+        $select_role_row = $db->fetchByAssoc($select_role);
+        $contact_id = $select_role_row['id'];
+
+        $data = $this->get_users_data($date_filter);
+
+        return $data;
+    }
+
+    function get_users_data($date_filter) {
+        global $db, $app_list_strings;
+        $data = array();
+        $r = 0;
+
+        $contacts_query = "SELECT c.id as id, c.first_name as first_name, c.last_name as last_name, cc.unique_customer_code_c as unique_customer_code_c, ea.email_address as email_address, c.phone_mobile as phone_mobile, cc.gateway_c as gateway_c, cc.campaign_type_c as campaign_type_c, u.user_name as user_name, cc.product_interest_c as product_interest_c, cc.product_sub_type_interest_c as product_sub_type_interest_c, c.date_entered as date_entered, cc.sales_stage_c as sales_stage_c, cc.next_call_planning_comments_c as next_call_planning_comments_c, cc.user_allocation_date_c as user_allocation_date_c FROM contacts c LEFT JOIN contacts_cstm cc ON c.id = cc.id_c join users u on u.id = c.assigned_user_id LEFT JOIN email_addr_bean_rel eabl  ON eabl.bean_id = c.id AND eabl.bean_module = 'Contacts' and eabl.primary_address = 1 and eabl.deleted=0 LEFT JOIN email_addresses ea ON (ea.id = eabl.email_address_id) where $date_filter AND c.deleted=0 AND u.user_name !='poorti' ORDER BY c.date_entered DESC";
+
+        $contact_result = $db->query($contacts_query);
+
+        while ($contact_row = $db->fetchByAssoc($contact_result)) {
+            $data[$r]['unique_customer_code_c'] = $contact_row['unique_customer_code_c'];
+            $data[$r]['first_name'] = $contact_row['first_name'];
+            $data[$r]['last_name'] = $contact_row['last_name'];
+            $data[$r]['email_address'] = $contact_row['email_address'];
+            $data[$r]['phone_mobile'] = $contact_row['phone_mobile'];
+            $data[$r]['gateway_c'] = $contact_row['gateway_c'];
+            $data[$r]['campaign_type_c'] = $contact_row['campaign_type_c'];
+            $data[$r]['user_name'] = $contact_row['user_name'];
+            $data[$r]['product_interest_c'] = $contact_row['product_interest_c'];
+            $data[$r]['product_sub_type_interest_c'] = $contact_row['product_sub_type_interest_c'];
+            $data[$r]['date_entered'] = date('d/m/Y h:i a ', strtotime($contact_row['date_entered']));
+            $data[$r]['user_allocation_date_c'] = (!empty($contact_row['user_allocation_date_c'])? date('d/m/Y h:i a ', strtotime($contact_row['user_allocation_date_c'])) : '');
+
+            if (!empty($data[$r]['user_allocation_date_c'])) {
+                $seconds = strtotime($contact_row['user_allocation_date_c']) - strtotime($contact_row['date_entered']);
+
+                $days = floor($seconds / 86400);
+                $hours = floor(($seconds - ($days * 86400)) / 3600);
+                $minutes = floor(($seconds - ($days * 86400) - ($hours * 3600)) / 60);
+                $seconds = floor(($seconds - ($days * 86400) - ($hours * 3600) - ($minutes * 60)));
+                $assignment_tat = "Days: $days, Hours: $hours, Minutes: $minutes, Seconds: $seconds";
+            }
+             $data[$r]['assignment_tat'] = (!empty($data[$r]['user_allocation_date_c'])) ? $assignment_tat: '';
+            $data[$r]['sales_stage_c'] = $contact_row['sales_stage_c'];
+            $data[$r]['next_call_planning_comments_c'] = $contact_row['next_call_planning_comments_c'];
+
+
+            $bean = BeanFactory::getBean('Contacts', $contact_row['id']);
+
+            //If relationship is loaded
+            if ($bean->load_relationship('calls')) {
+                $my_calls = $bean->get_linked_beans('calls', 'Calls');
+            }
+
+            foreach ($my_calls as $calls) {
+
+                $array_call[] = array(
+                    "name" => $calls->name,
+                    "date_start" => date('Y-m-d H:i:s',strtotime('+5 hours +30 minutes',strtotime(($calls->fetched_row['date_start'])))),
+                   // "date_start" => $calls->date_start,
+                );
+            }
+
+            $name = 'date_start';
+            usort($array_call, function($a, $b) {
+              $ad = new DateTime($a['date_start']);
+              $bd = new DateTime($b['date_start']);
+
+              if ($ad == $bd) {
+                return 0;
+              }
+
+              return $ad < $bd ? -1 : 1;
+            });
+            $end_disposition_date = end($array_call);
+            
+          
+            $data[$r]['disposition1'] = $array_call[0]['name'];    
+           
+
+             if (!empty($array_call[0]['date_start']) && !empty($contact_row['user_allocation_date_c'])) {
+
+               $first_call_second = strtotime($array_call[0]['date_start']) - strtotime($contact_row['user_allocation_date_c']);
+
+                $first_call_days = abs(floor($first_call_second / 86400));
+                $first_call_hours = abs(floor(($first_call_second - ($first_call_days * 86400)) / 3600));
+                $first_call_minutes = abs(floor(($first_call_second - ($first_call_days * 86400) - ($first_call_hours * 3600)) / 60));
+                $first_call_seconds = abs(floor(($first_call_second - ($first_call_days * 86400) - ($first_call_hours * 3600) - ($first_call_minutes * 60))));
+                $first_call_tat = "Days: $first_call_days, Hours: $first_call_hours, Minutes: $first_call_minutes, Seconds: $first_call_seconds";
+            }
+           $data[$r]['first_call_tat'] = (!empty($array_call[0]['date_start'])) ? $first_call_tat : '';
+            $data[$r]['disposition1_date_time'] =(!empty($array_call[0]['date_start']))?(date('d/m/Y h:i a',strtotime($array_call[0]['date_start']))):'';
+            $data[$r]['disposition2'] = $array_call[1]['name'];
+            $data[$r]['disposition2_date_time'] = (!empty($array_call[1]['date_start']))?(date('d/m/Y h:i a',strtotime($array_call[1]['date_start']))):'';
+            $data[$r]['disposition3'] = $array_call[2]['name'];
+            $data[$r]['disposition3_date_time'] = (!empty($array_call[2]['date_start']))?(date('d/m/Y h:i a',strtotime($array_call[2]['date_start']))):'';
+            $data[$r]['disposition4'] = $array_call[3]['name'];
+            $data[$r]['disposition4_date_time'] = (!empty($array_call[3]['date_start']))?(date('d/m/Y h:i a',strtotime($array_call[3]['date_start']))):'';
+            $data[$r]['disposition5'] = $array_call[4]['name'];
+            $data[$r]['disposition5_date_time'] = (!empty($array_call[4]['date_start']))?(date('d/m/Y h:i a',strtotime($array_call[4]['date_start']))):'';
+            $data[$r]['disposition6'] = $array_call[5]['name'];
+            $data[$r]['disposition6_date_time'] = (!empty($array_call[5]['date_start']))?(date('d/m/Y h:i a',strtotime($array_call[5]['date_start']))):'';
+            $data[$r]['disposition7'] = $array_call[6]['name'];
+            $data[$r]['disposition7_date_time'] = (!empty($array_call[6]['date_start']))?(date('d/m/Y h:i a',strtotime($array_call[6]['date_start']))):'';
+            $data[$r]['disposition8'] = $array_call[7]['name'];
+            $data[$r]['disposition8_date_time'] = (!empty($array_call[7]['date_start']))?(date('d/m/Y h:i a',strtotime($array_call[7]['date_start']))):'';
+            $data[$r]['disposition9'] = $array_call[8]['name'];
+            $data[$r]['disposition9_date_time'] = (!empty($array_call[8]['date_start']))?(date('d/m/Y h:i a',strtotime($array_call[8]['date_start']))):'';
+            $data[$r]['disposition10'] = $array_call[9]['name'];
+            $data[$r]['disposition10_date_time'] = (!empty($array_call[9]['date_start']))?(date('d/m/Y h:i a',strtotime($array_call[9]['date_start']))):'';        
+
+            if (!empty($end_disposition_date['date_start'])) {
+                $end_to_end_tat_seconds = strtotime($end_disposition_date['date_start']) - strtotime($contact_row['date_entered']);
+
+                $end_to_end_tat_days = floor($end_to_end_tat_seconds / 86400);
+                $end_to_end_tat_hours = floor(($end_to_end_tat_seconds - ($end_to_end_tat_days * 86400)) / 3600);
+                $end_to_end_tat_minutes = floor(($end_to_end_tat_seconds - ($end_to_end_tat_days * 86400) - ($end_to_end_tat_hours * 3600)) / 60);
+                $end_to_end_tat_seconds = floor(($end_to_end_tat_seconds - ($end_to_end_tat_days * 86400) - ($end_to_end_tat_hours * 3600) - ($end_to_end_tat_minutes * 60)));
+                $end_to_end_tat = "Days: $end_to_end_tat_days, Hours: $end_to_end_tat_hours, Minutes: $end_to_end_tat_minutes, Seconds: $end_to_end_tat_seconds";
+            }         
+            
+            $data[$r]['end_to_end_tat'] = (!empty($end_disposition_date['date_start'])) ? $end_to_end_tat : '';
+
+
+            unset($array_call);
+            $r++;
+        }
+        return $data;
+    }
+
+}

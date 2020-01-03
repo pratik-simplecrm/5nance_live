@@ -1,0 +1,33 @@
+<?php
+if(!defined('sugarEntry') || !sugarEntry) die('Not A Valid Entry Point');
+//ini_set("display_errors","On");
+
+class UpdateCallAssignment{
+  function UpdateCallAssignment($bean,$event,$arguments){
+    global $current_user;
+    global $db;
+    $bean_fetched = $bean->fetched_row;
+    $assigned_user_new = $bean->assigned_user_id;
+    $assigned_user_old = $bean->fetched_row['assigned_user_id'];
+    $contact_id = $bean->id;
+  
+  if($assigned_user_new!=$assigned_user_old)
+  {
+    /********************planned activities for old assigned user***************************/
+    $fetch_followup_call = "select id, status from calls where status='Planned' and parent_id='$contact_id' and deleted=0 and assigned_user_id='$assigned_user_old'";
+    $result_followup_call = $db->query($fetch_followup_call);
+    if($result_followup_call->num_rows > 0){
+        while($row_followup_call = $db->fetchByAssoc($result_followup_call)){
+        $call_id = $row_followup_call['id'];
+        $db->query("update calls set assigned_user_id='$assigned_user_new' where status='Planned' and parent_id='$contact_id' and deleted=0 and assigned_user_id='$assigned_user_old'");
+        /***************update call users relationship with new user********************/
+        $db->query("update calls_users set user_id='$assigned_user_new' where call_id='$call_id' and user_id='$assigned_user_old' and deleted=0");
+
+      }
+    }
+    
+  
+  }
+//exit;
+  }
+}

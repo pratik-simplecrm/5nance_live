@@ -1,0 +1,243 @@
+<?php
+if (!define('sugarEntry'))
+    define('sugarEntry', true);
+require_once('include/entryPoint.php');
+ini_set('display_errors','On');
+//echo 'hi';exit;
+global $db, $sugar_config;
+//$sugar_url = $sugar_config["site_url"];
+$username = $sugar_config["webservice_username"];
+$password = $sugar_config["webservice_password"];
+echo "<pre>";
+//$url = 'http://122.169.109.21:9001/getuserdataforcrm';
+//$url = 'http://122.169.109.21:9001/getactiveusers';
+//$url = 'https://api.5nance.com/getuserdataforcrm';
+ $url = 'https://api.5nance.com/GetAllCity';
+ 
+ $ch = curl_init($url);
+curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
+curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch,CURLOPT_HTTPHEADER, array('Authorization:Crypto 4IilG3pP+ESLwADK0b4TboG2Okn54Fixu4dW9P7ayHpUSXgNHpz11CdZP5qXK0XI',
+										 'Content-Type: application/json',
+										 'Content-Length: ' . strlen($postData)));
+$result = curl_exec($ch);
+ curl_close($ch);
+$GetUserDataforCRM = json_decode($result, true);
+//~ 
+ echo "<pre>";
+ print_r($result);exit;
+//~ $GetUserData = $GetUserDataforCRM['data'];
+//$GetUserData = $GetUserDataforCRM['data'];
+ //~ if (empty($GetUserData)) {
+	 //~ echo "empty result";exit;
+        //~ $GetUserDataCRMStatus = array(
+            //~ 'notice' => 'Returned empty data array.'
+        //~ );
+        //~ $schedulerHandle = fopen($schedulerLogFile, 'a');
+        //~ $timestamp = date('Y-M-d H:m:s', strtotime('now'));
+        //~ $logArray = print_r($GetUserDataCRMStatus, true);
+        //~ $logMessage = "\n\nScheduler Result at $timestamp :-\n$logArray";
+        //~ fwrite($schedulerHandle,"Hi");
+        //~ fwrite($schedulerHandle, $logMessage);
+        //~ print_r($GetUserDataCRMStatus);
+        //~ return false;
+    //~ }
+
+$loginResult = login($username, $password);
+//session ID
+$sessionID = $loginResult->id;
+$module = "Contacts";
+//~ print_r($GetUserData);
+//~ exit;
+//foreach($GetUserData as $GetUserSet){
+	$salutation = $GetUserSet["salutation"];
+	$name = $GetUserSet["name"];	
+	$emailID = $GetUserSet["emailID"];
+	$mobileNumber = $GetUserSet["mobileNumber"];
+	$uniqueCustomerCode = $GetUserSet["uniqueCustomerCode"];
+	$classificationOfTheAccountForPotential = $GetUserSet["classificationOfTheAccountForPotential"];
+	$address = $GetUserSet["address"];
+	$city = $GetUserSet["city"];
+	$state = $GetUserSet["state"];
+	$country = $GetUserSet["country"];
+	$pinCode = $GetUserSet["pinCode"];
+	$gateway = $GetUserSet["gateway"];
+	$campaignType = $GetUserSet["campaignType"];
+	$campaignSubType = $GetUserSet["campaignSubType"];
+	$relatedCorporateAccount = $GetUserSet["relatedCorporateAccount"];
+	$relatedKioskAccount = $GetUserSet["relatedKioskAccount"];
+	$userType = $GetUserSet["userType"];
+	$adoptionPercentage = $GetUserSet["adoptionPercentage"];
+	$userCreationDate = $GetUserSet["userCreationDate"];
+	if(!(empty($name)))
+	{
+		$name_array = explode(" ", $name,2);
+		$first_name = $name_array[0];
+		$last_name	 = $name_array[1];
+	}
+	if(!empty($city))
+	{
+		$fieldname = "city_c";
+		$get_city_code = getdropdown($sessionID,$module,$city,$fieldname);
+	}
+	if(!empty($state))
+	{
+		$fieldname = "state_c";
+		$get_state_code = getdropdown($sessionID,$module,$state,$fieldname);
+	}
+	if(!empty($pincode))
+	{
+		$fieldname = "postalcode_c";
+		$get_postal_code = getdropdown($sessionID,$module,$pincode,$fieldname);
+	}
+	if(!empty($userType))
+	{
+		$fieldname = "user_type_c";
+		$userType = getdropdown($sessionID,$module,$userType,$fieldname);
+	}
+	//~ 10.   CORPORATE - TECH MAHINDRA
+//~ 11.   CORPORATE - TECH MAHINDRA PUNE QR
+//~ 12.   EXTERNALBO
+//~ 13.   5NANCE.COM - TECHMAHINDRA HYDERABAD
+	echo $gateway='5NANCE.COM - TECHMAHINDRA HYDERABAD';
+	if(!empty($gateway))
+	{
+		$fieldname = "gateway_c";
+			if($gateway == 'EXTERNALBO'){
+				$gateway = 'Digital Marketing';
+			}
+			if(strpos($gateway,'-')!==false){
+				$gateway_array = explode("-", $gateway);
+				$gateway = $gateway_array[0];
+			}
+		echo	$gateway = getdropdown($sessionID,$module,$gateway,$fieldname);
+	}
+	exit;
+	 $name_value_list = array(
+				(!empty($salutation) ? array('name' => 'salutation','value' => $salutation) : ''),
+				(!empty($first_name) ? array('name' => 'first_name','value' => trim($first_name)) : ''),
+				(!empty($last_name) ? array('name' => 'last_name','value' => trim($last_name)) : ''),
+				(!empty($emailID) ? array('name' => 'email1','value' => $emailID) : ''),
+				(!empty($mobileNumber) ? array('name' => 'phone_mobile','value' => $mobileNumber) : ''),
+				(!empty($uniqueCustomerCode) ? array('name' => 'unique_customer_code_c','value' => $uniqueCustomerCode) : ''),
+				(!empty($address) ? array('name' => 'address_c','value' => $address) : ''),
+				(!empty($city) ? array('name' => 'city_c','value' => $get_city_code) : ''),
+				(!empty($state) ? array('name' => 'state_c','value' => $get_state_code) : ''),
+				(!empty($pinCode) ? array('name' => 'postalcode_c','value' => $get_postal_code) : ''),
+				(!empty($gateway) ? array('name' => 'gateway_c','value' => $gateway) : ''),
+				(!empty($campaignType) ? array('name' => 'campaign_type_c','value' => $campaignType) : ''),
+				(!empty($campaignSubType) ? array('name' => 'campaign_sub_type_c','value' => $campaignSubType) : ''),
+				(!empty($relatedCorporateAccount) ? array('name' => 'related_corporate_account_c','value' => $relatedCorporateAccount) : ''),
+				(!empty($relatedKioskAccount) ? array('name' => 'related_kiosk_account_c','value' => $relatedKioskAccount) : ''),
+				(!empty($userType) ? array('name' => 'user_type_c','value' => $userType) : ''),
+				(!empty($adoptionPercentage) ? array('name' => 'adoption_percentage_c','value' => $adoptionPercentage) : ''),
+				(!empty($classificationOfTheAccountForPotential) ? array('name' => 'classification_accoun_c','value' => $classificationOfTheAccountForPotential) : ''),
+			);
+			/*************************check unique code exists or not******************************/
+			$get_unique_code_query = $db->query("select id from contacts join contacts_cstm where id=id_c and deleted=0 and unique_customer_code_c = '$uniqueCustomerCode'");
+			if($get_unique_code_query->num_rows == 0){
+				echo "not exists";
+				$user_creation = create_user($sessionID,$module,$name_value_list);
+			}else{
+				echo "exists";
+				$row_unique_code = $db->fetchByAssoc($get_unique_code_query);
+				$name_value_list[] = array('name' => 'id','value' => $row_unique_code['id']);
+				$user_creation = create_user($sessionID,$module,$name_value_list);
+			}
+			exit;
+			
+//}
+//contact creation
+function create_user($sessionID,$module,$name_value_list){		
+	$createuser = array(
+                    "session" => $sessionID,
+                    "module_name" => $module,
+                    "name_value_list" => $name_value_list,
+                );
+              $setuserEntryID = call("set_entry", $createuser);
+			  return $setuserEntryID;
+	}
+//function to make cURL request
+function call($method, $parameters)
+{
+		global $sugar_config;
+		ob_start();
+		
+		$curl_request = curl_init();
+		$curlURL = $sugar_config["webservice_url"];
+        curl_setopt($curl_request, CURLOPT_URL, $curlURL);
+        curl_setopt($curl_request, CURLOPT_POST, 1);
+        curl_setopt($curl_request, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_0);
+        curl_setopt($curl_request, CURLOPT_HEADER, 1);
+        curl_setopt($curl_request, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($curl_request, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl_request, CURLOPT_FOLLOWLOCATION, 0);
+
+        $jsonEncodedData = json_encode($parameters);
+
+        $post = array(
+             "method" => $method,
+             "input_type" => "JSON",
+             "response_type" => "JSON",
+             "rest_data" => $jsonEncodedData
+        );
+
+        curl_setopt($curl_request, CURLOPT_POSTFIELDS, $post);
+        $result = curl_exec($curl_request);
+        curl_close($curl_request);
+
+        $result = explode("\r\n\r\n", $result, 2);
+        $response = json_decode($result[1]);
+        ob_end_flush();
+
+        return $response;
+}
+//login ------------------------------     
+function login($username,$password){
+    $login_parameters = array(
+         "user_auth" => array(
+              "user_name" => $username,
+              "password" => md5($password),
+              "version" => "1"
+         ),
+         "application_name" => "RestTest",
+         "name_value_list" => array(),
+    );
+
+    $login_result = call("login", $login_parameters);
+    return $login_result;
+}
+
+function getdropdown($sessionID,$module, $needle,$fieldname) {
+  
+	
+    $getContactFields = array(
+        'session' => $sessionID,
+        'module_name' => $module,
+    );
+    $getdropdownresult = call('get_module_fields', $getContactFields)->module_fields;
+
+    $getdropdownvalues = $getdropdownresult->$fieldname->options;
+
+    foreach ($getdropdownvalues as $getdropdownKey => $getdropdownValue) {
+		if(!empty($getdropdownValue->value))
+		{
+			if (strpos(strtolower($getdropdownValue->value), strtolower($needle)) !== false || strpos(strtolower($needle), strtolower($getdropdownValue->value)) !== false) {
+				return $getdropdownKey;
+			} else {
+				$return = '';
+			}	
+		}
+		else
+		{
+			$return = '';
+		}
+    }
+
+    return $return;
+}
+echo "<pre>";
+print_r($get_output_data);
+
+?>
